@@ -1,0 +1,10 @@
+{
+    "name": "graphql-tutorial-server",
+    "version": "0.0.1",
+    "private": true,
+    "type": "module",
+    "dependencies": {
+        "@apollo/server": "^4.10.4",
+        "graphql": "^16.8.1"
+    }
+}
