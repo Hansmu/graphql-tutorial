@@ -25,6 +25,8 @@ type Job {
     # In GraphQL, all fields, by default, are nullable
     # If we want to specify that the field is non-nullable, then we'd add an exclamation mark
     id: ID!
+    # As there is no actual date object, then just using a string here
+    date: String!
     title: String!
     description: String
 }
