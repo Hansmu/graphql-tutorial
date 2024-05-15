@@ -21,11 +21,19 @@ type Query {
 #
 # There are a bunch of scalar fields, but in addition to common ones, there's the ID
 # The ID signifies that it doesn't need to be human readable, and it can be used by GraphQL for whatever an ID would be used
+"""
+Represents a job ad posted to our board.
+"""
 type Job {
     # In GraphQL, all fields, by default, are nullable
     # If we want to specify that the field is non-nullable, then we'd add an exclamation mark
+    
+    # You can add documentation that'll be shown in the Apollo client by surrounding text with three double quotes
+    # You can also use markdown in the comments
+    """ Primary key of the job """
     id: ID!
     # As there is no actual date object, then just using a string here
+    """ Date when the job was published """
     date: String!
     title: String!
     description: String

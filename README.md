@@ -76,3 +76,11 @@ When looking at the body, then you can see a string:
 ```
 
 So the query that you write will get turned into a string and sent to the server.
+
+## Resolver chain
+
+Basically when data is basic resolved, then the first thing that happens is the base query will be defined. 
+
+For example, in our code, that'd be the `jobs` query.
+
+GraphQL will get the data and keep it in memory. 
