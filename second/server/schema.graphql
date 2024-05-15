@@ -1,9 +1,16 @@
 type Query {
-    job: Job
+    # To make something an array, you surround the type with brackets ([])
+    # Also, by default, [Job] means that the array can return null values
+    # You need an exclamation mark to mark it as not containing nulls
+    job: [Job!]
 }
 
 # You can define a custom object using the same syntax as the base query.
 # type FollowedByTheName
+#
+# When we're writing a query, then it doesn't matter if the return type is an array or a single object
+# The syntax would be the same
+#
 # Now when we want to query it, we can write a query like:
 # query {
 #   job {
@@ -11,10 +18,13 @@ type Query {
 #       description
 #   }   
 # }
+#
 # There are a bunch of scalar fields, but in addition to common ones, there's the ID
 # The ID signifies that it doesn't need to be human readable, and it can be used by GraphQL for whatever an ID would be used
 type Job {
-    id: ID
-    title: String
+    # In GraphQL, all fields, by default, are nullable
+    # If we want to specify that the field is non-nullable, then we'd add an exclamation mark
+    id: ID!
+    title: String!
     description: String
 }
