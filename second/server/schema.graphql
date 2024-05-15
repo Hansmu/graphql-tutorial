@@ -36,5 +36,25 @@ type Job {
     """ Date when the job was published """
     date: String!
     title: String!
+    company: Company!
+    description: String
+}
+
+# When you start writing a query now, then remember that you have an object here
+# So you have to define that you want the object and all of the fields it contains
+# query {
+#   jobs {
+#     title
+#     description
+#     date
+#     company {
+#       id
+#       name      
+#     }
+#   }
+# }
+type Company {
+    id: ID!
+    name: String!
     description: String
 }
