@@ -2,7 +2,7 @@ type Query {
     # To make something an array, you surround the type with brackets ([])
     # Also, by default, [Job] means that the array can return null values
     # You need an exclamation mark to mark it as not containing nulls
-    job: [Job!]
+    jobs: [Job!]
 }
 
 # You can define a custom object using the same syntax as the base query.
