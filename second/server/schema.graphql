@@ -1,3 +1,20 @@
 type Query {
-    greeting: String
+    job: Job
+}
+
+# You can define a custom object using the same syntax as the base query.
+# type FollowedByTheName
+# Now when we want to query it, we can write a query like:
+# query {
+#   job {
+#       title
+#       description
+#   }   
+# }
+# There are a bunch of scalar fields, but in addition to common ones, there's the ID
+# The ID signifies that it doesn't need to be human readable, and it can be used by GraphQL for whatever an ID would be used
+type Job {
+    id: ID
+    title: String
+    description: String
 }
