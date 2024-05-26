@@ -2,6 +2,22 @@ import { GraphQLClient, gql } from 'graphql-request';
 
 const client = new GraphQLClient('http://localhost:9000/graphql');
 
+export async function getCompany(id) {
+    const query = gql`
+        query CompanyById($idVariableRightHereToUse: ID!) {
+            company(id: $idVariableRightHereToUse) {
+                id
+                name
+                description
+            }
+        }      
+    `;
+
+    // Here we can then pass the variables as the second parameter
+    const data = await client.request(query, { idVariableRightHereToUse: id });
+    return data.company;
+}
+
 export async function getJob(id) {
     // You can also name your query, by adding a name after the `query` keyword
     const query = gql`
@@ -23,7 +39,6 @@ export async function getJob(id) {
 
     // Here we can then pass the variables as the second parameter
     const data = await client.request(query, { idVariableRightHereToUse: id });
-    console.log(data);
     return data.job;
 }
 

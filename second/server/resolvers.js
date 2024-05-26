@@ -7,7 +7,8 @@ export const resolvers = {
         // The second parameter will contain all the parameters that were passed in
         
         job: (_root, args) => getJob(args.id),
-        jobs: getJobs
+        jobs: getJobs,
+        company: (_root, args) => getCompany(args.id),
     },
     // We can define custom resolvers for fields in an object
     // Any resolver here will take precedence over the field value that comes from the DB

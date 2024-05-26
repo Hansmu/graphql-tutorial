@@ -14,6 +14,8 @@ type Query {
     # Also, by default, [Job] means that the array can return null values
     # You need an exclamation mark to mark it as not containing nulls
     jobs: [Job!]
+
+    company(id: ID!): Company
 }
 
 # You can define a custom object using the same syntax as the base query.
