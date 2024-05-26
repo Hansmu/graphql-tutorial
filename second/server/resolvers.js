@@ -1,4 +1,4 @@
-import { getJob, getJobs } from './db/jobs.js';
+import { getJob, getJobs, getJobsByCompany } from './db/jobs.js';
 import { getCompany } from './db/companies.js';
 
 export const resolvers = {
@@ -9,6 +9,9 @@ export const resolvers = {
         job: (_root, args) => getJob(args.id),
         jobs: getJobs,
         company: (_root, args) => getCompany(args.id),
+    },
+    Company: {
+        jobs: (company) => getJobsByCompany(company.id)
     },
     // We can define custom resolvers for fields in an object
     // Any resolver here will take precedence over the field value that comes from the DB

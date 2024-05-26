@@ -1,6 +1,7 @@
 import { useParams } from 'react-router';
 import { useEffect, useState } from 'react';
 import { getCompany } from '../graphql/queries';
+import JobList from '../components/JobList';
 
 function CompanyPage() {
   const { companyId } = useParams();
@@ -22,6 +23,8 @@ function CompanyPage() {
       <div className="box">
         {company.description}
       </div>
+
+      <JobList jobs={company.jobs}/>
     </div>
   );
 }

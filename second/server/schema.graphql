@@ -70,4 +70,7 @@ type Company {
     id: ID!
     name: String!
     description: String
+    # If we want the array to be non-nullable as well, then we add an extra exclamation mark at the end of the line
+    # However, probably doesn't matter in most cases, cus you're going to hit a DB and get either a filled or empty array
+    jobs: [Job!]!
 }
