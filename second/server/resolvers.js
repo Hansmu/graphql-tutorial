@@ -1,8 +1,12 @@
-import { getJobs } from './db/jobs.js';
+import { getJob, getJobs } from './db/jobs.js';
 import { getCompany } from './db/companies.js';
 
 export const resolvers = {
     Query: {
+        // The first parameter is the root object, which in this case will be undefined
+        // The second parameter will contain all the parameters that were passed in
+        
+        job: (_root, args) => getJob(args.id),
         jobs: getJobs
     },
     // We can define custom resolvers for fields in an object

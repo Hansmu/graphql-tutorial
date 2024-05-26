@@ -1,4 +1,15 @@
 type Query {
+    # To pass arguments to a query, you define it like a function
+    # You can define however many arguments you want here, and they'll be passed to the resolver function
+    #
+    # To query for it, you can defined it as such:
+    # query {
+    #     job(id: "f3YzmnBZpK0o", title: "Banana") {
+    #         id
+    #         title
+    #     }
+    # }
+    job(id: ID!, title: String): Job
     # To make something an array, you surround the type with brackets ([])
     # Also, by default, [Job] means that the array can return null values
     # You need an exclamation mark to mark it as not containing nulls
