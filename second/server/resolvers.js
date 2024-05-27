@@ -1,14 +1,46 @@
 import { getJob, getJobs, getJobsByCompany } from './db/jobs.js';
 import { getCompany } from './db/companies.js';
+import { GraphQLError } from 'graphql';
+
+const notFoundError = (message) => {
+    return new GraphQLError(message, {
+        extensions: {
+            code: 'NOT_FOUND'
+        }
+    });
+};
 
 export const resolvers = {
     Query: {
         // The first parameter is the root object, which in this case will be undefined
         // The second parameter will contain all the parameters that were passed in
         
-        job: (_root, args) => getJob(args.id),
+        job: async (_root, args) => {
+            const job = await getJob(args.id);
+
+            if (!job) {
+                throw notFoundError(`No job found with ID ${args.id}`)
+            }
+
+            return job;
+        },
         jobs: getJobs,
-        company: (_root, args) => getCompany(args.id),
+        // When an invalid ID is provided, then this returns null. We probably don't want that
+        // There are two ways to go about this.
+        // 1. Declare that this cannot return null. 
+        //      This, however, makes the server throw an INTERNAL_SERVER_ERROR, so it's not optimal, because the real issue was an invalid ID.
+        // 2. Create a custom error
+        //      This'd provide proper info on what was actually wrong.
+        //      To do this, you can throw a GraphQLError, which can be imported from the `graphql` package.
+        company: async (_root, args) => {
+            const company = await getCompany(args.id);
+        
+            if (!company) {
+                throw notFoundError(`No company found with ID ${args.id}`);
+            }
+
+            return company;
+        },
     },
     Company: {
         jobs: (company) => getJobsByCompany(company.id)
