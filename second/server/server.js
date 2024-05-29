@@ -5,6 +5,7 @@ import express from 'express';
 import { readFile } from 'node:fs/promises';
 import { resolvers } from './resolvers.js';
 import { authMiddleware, handleLogin } from './auth.js';
+import { getUser } from './db/users.js';
 
 const PORT = 9000;
 
@@ -21,8 +22,24 @@ const apolloServer = new ApolloServer({ typeDefs, resolvers });
 await apolloServer.start();
 
 app.post('/login', handleLogin);
-app.use('/graphql', apolloMiddleware(apolloServer))
+// When we want to pass extra values into the GraphQL resolvers, then we can use the context property
+app.use('/graphql', apolloMiddleware(apolloServer, { context: getContext }))
 
 app.listen({ port: PORT }, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+// The middleware injects a couple of values in here, one of them being the request
+async function getContext({ req }) {
+  // auth is accessible because of the auth middleware. It's a decoded JWT.
+  if (req.auth) {
+    const userId = req.auth.sub;
+    const user = await getUser(userId);
+    
+    return {
+      user
+    };
+  }
+
+  return {};
+}

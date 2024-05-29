@@ -10,10 +10,23 @@ const notFoundError = (message) => {
     });
 };
 
+const unauthenticatedError = () => {
+    return new GraphQLError('Unauthenticated request', {
+        extensions: {
+            code: 'UNAUTHENTICATED'
+        }
+    });
+};
+
 export const resolvers = {
     Mutation: {
-        createJob: (_root, { input: { title, description } }) => {
-            const companyId = 'FjcJCHJALA4i'; // TODO Fix once company based sessions exist
+        // The third parameter is the context variable that's filled in server.js
+        createJob: (_root, { input: { title, description } }, { user }) => {
+            if (!user) {
+                throw unauthenticatedError();
+            }
+
+            const companyId = user.companyId;
             return createJob({ companyId, title, description });
         },
         updateJob: (_root, { input: { id, title, description } }) => updateJob({ id, title, description }),
