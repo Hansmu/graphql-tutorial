@@ -3,11 +3,19 @@
 # They're separate from queries
 type Mutation {
     createJob(input: CreateJobInput!): Job
+    updateJob(input: UpdateJobInput!): Job
+    deleteJob(id: ID!): Job
 }
 
 # GraphQL separates inputs and outputs, mutations and queries
 # Because of this, if you want to define the inputs to a mutation using a separate type, then you have to use the `input` keyword
 input CreateJobInput {
+    title: String!
+    description: String
+}
+
+input UpdateJobInput {
+    id: ID!
     title: String!
     description: String
 }  
