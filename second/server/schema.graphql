@@ -1,3 +1,17 @@
+# The default name for a mutation object
+# Mutations are changes to data
+# They're separate from queries
+type Mutation {
+    createJob(input: CreateJobInput!): Job
+}
+
+# GraphQL separates inputs and outputs, mutations and queries
+# Because of this, if you want to define the inputs to a mutation using a separate type, then you have to use the `input` keyword
+input CreateJobInput {
+    title: String!
+    description: String
+}  
+
 type Query {
     # To pass arguments to a query, you define it like a function
     # You can define however many arguments you want here, and they'll be passed to the resolver function
