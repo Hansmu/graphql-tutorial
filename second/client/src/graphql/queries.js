@@ -2,6 +2,25 @@ import { GraphQLClient, gql } from 'graphql-request';
 
 const client = new GraphQLClient('http://localhost:9000/graphql');
 
+export async function createJob({ title, description }) {
+    const mutation = gql`
+        mutation CreateJob($input: CreateJobInput!) {
+            # You can add aliases to the return values
+            # Without the "job" alias here the return for this call would be createJob
+            # { "data": { "createJob": { "id": "asdsa" } }
+            # However, when you alias it, you get
+            # { "data": { "job": { "id": "asdsa" } }
+            job: createJob(input: $input) {
+                id
+            }
+        }
+    `;
+
+    const data = await client.request(mutation, { input: { title, description } });
+
+    return data.job;
+}
+
 export async function getCompany(id) {
     const query = gql`
         query CompanyById($idVariableRightHereToUse: ID!) {
