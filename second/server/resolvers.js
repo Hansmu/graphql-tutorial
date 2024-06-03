@@ -30,7 +30,21 @@ export const resolvers = {
             return createJob({ companyId, title, description });
         },
         updateJob: (_root, { input: { id, title, description } }) => updateJob({ id, title, description }),
-        deleteJob: (_root, { id }) => deleteJob(id)
+        deleteJob: async (_root, { id }, { user }) => {
+            if (!user) {
+                throw unauthenticatedError();
+            }
+
+            const companyId = user.companyId;
+            
+            const job = await deleteJob(id, companyId);
+
+            if (!job) {
+                throw notFoundError(`No job found with id ${id}`);
+            }
+
+            return job;
+        }
     },
     Query: {
         // The first parameter is the root object, which in this case will be undefined
