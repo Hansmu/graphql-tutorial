@@ -1,4 +1,5 @@
-import { GraphQLClient, gql } from 'graphql-request';
+import { ApolloClient, InMemoryCache, gql } from '@apollo/client';
+import { GraphQLClient } from 'graphql-request';
 import { getAccessToken } from '../lib/auth';
 
 const client = new GraphQLClient('http://localhost:9000/graphql', {
@@ -13,6 +14,11 @@ const client = new GraphQLClient('http://localhost:9000/graphql', {
 
         return {};
     }
+});
+
+const apolloClient = new ApolloClient({
+    uri: 'http://localhost:9000/graphql',
+    cache: new InMemoryCache()
 });
 
 export async function updateJob(id, { title, description }) {
@@ -79,8 +85,13 @@ export async function getCompany(id) {
     `;
 
     // Here we can then pass the variables as the second parameter
-    const data = await client.request(query, { idVariableRightHereToUse: id });
-    return data.company;
+    const result = await apolloClient.query({
+        query,
+        variables: {
+            idVariableRightHereToUse: id
+        }
+    });
+    return result.data.company;
 }
 
 export async function getJob(id) {
@@ -103,8 +114,13 @@ export async function getJob(id) {
     `;
 
     // Here we can then pass the variables as the second parameter
-    const data = await client.request(query, { idVariableRightHereToUse: id });
-    return data.job;
+    const result = await apolloClient.query({
+        query,
+        variables: {
+            idVariableRightHereToUse: id
+        }
+    });
+    return result.data.job;
 }
 
 export async function getJobs() {
@@ -123,7 +139,7 @@ export async function getJobs() {
         }      
     `;
 
-    const data = await client.request(query);
-    return data.jobs;
+    const result = await apolloClient.query({ query });
+    return result.data.jobs;
 }
 

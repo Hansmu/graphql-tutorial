@@ -84,3 +84,13 @@ Basically when data is basic resolved, then the first thing that happens is the 
 For example, in our code, that'd be the `jobs` query.
 
 GraphQL will get the data and keep it in memory. 
+
+## Frontend library
+
+When using GraphQL, you might want a frontend library that abstracts the communication with GraphQL.
+
+One more full option would be to use Apollo Client.
+
+The main feature that it brings to the table is caching.
+
+Also it fully handles the query with all of its states.
