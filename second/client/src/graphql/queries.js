@@ -1,23 +1,44 @@
-import { ApolloClient, InMemoryCache, gql } from '@apollo/client';
+import { ApolloClient, InMemoryCache, concat, gql, createHttpLink, ApolloLink } from '@apollo/client';
 import { GraphQLClient } from 'graphql-request';
 import { getAccessToken } from '../lib/auth';
 
-const client = new GraphQLClient('http://localhost:9000/graphql', {
-    headers: () => {
-        const accessToken = getAccessToken();
+// const client = new GraphQLClient('http://localhost:9000/graphql', {
+//     headers: () => {
+//         const accessToken = getAccessToken();
 
-        if (accessToken) {
-            return {
-                'Authorization': `Bearer ${accessToken}`
-            };
-        }
+//         if (accessToken) {
+//             return {
+//                 'Authorization': `Bearer ${accessToken}`
+//             };
+//         }
 
-        return {};
-    }
+//         return {};
+//     }
+// });
+
+// When the ApolloClient had only the URI defined, then it was creating an httpLink automatically
+// When using the ApolloClient, you have have one or the other defined - URI/link, but not both
+const httpLink = createHttpLink({
+    uri: 'http://localhost:9000/graphql'
 });
 
+// Kind of similar to middlewares. You add links to a chain, perform operations and forward as needed.
+const authLink = new ApolloLink((operation, forward) => {
+    const accessToken = getAccessToken();
+
+    if (accessToken) {
+        operation.setContext({
+            headers: {
+                'Authorization': `Bearer ${accessToken}`
+            }
+        });
+    }
+
+    return forward(operation);
+})
+
 const apolloClient = new ApolloClient({
-    uri: 'http://localhost:9000/graphql',
+    link: concat(authLink, httpLink),
     cache: new InMemoryCache()
 });
 
@@ -30,9 +51,12 @@ export async function updateJob(id, { title, description }) {
         }
     `;
 
-    const data = await client.request(update, { id, title, description });
+    const result = await apolloClient.mutate({
+        update,
+        variables: { id, title, description }
+    })
 
-    return data.job;
+    return result.data.job;
 }
 
 export async function deleteJob(id) {
@@ -44,9 +68,14 @@ export async function deleteJob(id) {
         }
     `;
 
-    const data = await client.request(deletion, { id });
+    const result = await apolloClient.mutate({
+        deletion,
+        variables: {
+            id
+        }    
+    })
 
-    return data.job;
+    return result.data.job;
 }
 
 export async function createJob({ title, description }) {
@@ -63,9 +92,17 @@ export async function createJob({ title, description }) {
         }
     `;
 
-    const data = await client.request(mutation, { input: { title, description } });
+    const result = await apolloClient.mutate({
+        mutation,
+        variables: {
+            input: {
+                title,
+                description
+            }
+        }    
+    })
 
-    return data.job;
+    return result.data.job;
 }
 
 export async function getCompany(id) {
@@ -126,7 +163,7 @@ export async function getJob(id) {
 export async function getJobs() {
     // gql is a convenience method to get syntax highlighting in your IDE
     const query = gql`
-        query {
+        query Jobs {
             jobs {
                 id
                 date
