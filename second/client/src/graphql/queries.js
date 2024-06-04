@@ -124,25 +124,25 @@ query JobById($idVariableRightHereToUse: ID!) {
 ${jobDetailFragment}  
 `;
 
-export async function createJob({ title, description }) {
-    const mutation = gql`
-        mutation CreateJob($input: CreateJobInput!) {
-            # You can add aliases to the return values
-            # Without the "job" alias here the return for this call would be createJob
-            # { "data": { "createJob": { "id": "asdsa" } }
-            # However, when you alias it, you get
-            # { "data": { "job": { "id": "asdsa" } }
-            job: createJob(input: $input) {
-                # Currently, when we're creating a job, we'd be querying for the job by ID right after creating it
-                # However, we could just return the entire object from the same create request
-                ...JobDetail
-            }
-        }
-        ${jobDetailFragment}
-    `;
+export const createJobMutation = gql`
+mutation CreateJob($input: CreateJobInput!) {
+    # You can add aliases to the return values
+    # Without the "job" alias here the return for this call would be createJob
+    # { "data": { "createJob": { "id": "asdsa" } }
+    # However, when you alias it, you get
+    # { "data": { "job": { "id": "asdsa" } }
+    job: createJob(input: $input) {
+        # Currently, when we're creating a job, we'd be querying for the job by ID right after creating it
+        # However, we could just return the entire object from the same create request
+        ...JobDetail
+    }
+}
+${jobDetailFragment}
+`;
 
+export async function createJob({ title, description }) {
     const result = await apolloClient.mutate({
-        mutation,
+        mutation: createJobMutation,
         variables: {
             input: {
                 title,
