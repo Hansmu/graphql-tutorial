@@ -1,31 +1,20 @@
 import { useParams } from 'react-router';
 import { useEffect, useState } from 'react';
-import { getCompany } from '../graphql/queries';
+import { getCompany, getCompanyByIdQuery } from '../graphql/queries';
 import JobList from '../components/JobList';
+import { useQuery } from '@apollo/client';
 
 function CompanyPage() {
   const { companyId } = useParams();
-  const [ state, setState ] = useState({
-    company: null,
-    loading: true,
-    error: false
+
+  // Notice that you're building basically the same thing as with the original query, but now you have hooks integration
+  const companyQuery = useQuery(getCompanyByIdQuery, {
+    variables: {
+      idVariableRightHereToUse: companyId
+    }
   });
 
-  const { company, loading, error } = state;
-
-  useEffect(() => {
-    getCompany(companyId)
-      .then(company => setState({
-        company,
-        loading: false,
-        error: false,
-      }))
-      .catch(() => setState({
-        company: null,
-        loading: false,
-        error: true
-      }));
-  }, [companyId]);
+  const { data, loading, error } = companyQuery;
 
   if (loading) {
     return <div>Loading...</div>;
@@ -34,6 +23,8 @@ function CompanyPage() {
   if (error) {
     return <div>Data unavailable</div>
   }
+
+ const { company } = data;
 
   return (
     <div>

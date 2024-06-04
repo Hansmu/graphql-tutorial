@@ -37,7 +37,7 @@ const authLink = new ApolloLink((operation, forward) => {
     return forward(operation);
 })
 
-const apolloClient = new ApolloClient({
+export const apolloClient = new ApolloClient({
     link: concat(authLink, httpLink),
     // When we use the ApolloClient, then there is a cache
     // This means that whenever you make a request that has already been made, then Apollo reaches into the cache to get the result
@@ -111,7 +111,7 @@ const jobDetailFragment = gql`
 `;
 
 // You can also name your query, by adding a name after the `query` keyword
-const jobByIdQuery = gql`
+export const jobByIdQuery = gql`
 # To provide variables using GQL's own mechanisms, you can define them in the query bit
 # You can use string interpolation as well, but that comes with all sorts of annoyances
 query JobById($idVariableRightHereToUse: ID!) {
@@ -169,25 +169,25 @@ export async function createJob({ title, description }) {
     return result.data.job;
 }
 
-export async function getCompany(id) {
-    const query = gql`
-        query CompanyById($idVariableRightHereToUse: ID!) {
-            company(id: $idVariableRightHereToUse) {
+export const getCompanyByIdQuery = gql`
+    query CompanyById($idVariableRightHereToUse: ID!) {
+        company(id: $idVariableRightHereToUse) {
+            id
+            name
+            description
+            jobs {
                 id
-                name
-                description
-                jobs {
-                    id
-                    date
-                    title
-                }
+                date
+                title
             }
-        }      
-    `;
+        }
+    }      
+`;
 
+export async function getCompany(id) {
     // Here we can then pass the variables as the second parameter
     const result = await apolloClient.query({
-        query,
+        query: getCompanyByIdQuery,
         variables: {
             idVariableRightHereToUse: id
         }
@@ -206,24 +206,24 @@ export async function getJob(id) {
     return result.data.job;
 }
 
-export async function getJobs() {
-    // gql is a convenience method to get syntax highlighting in your IDE
-    const query = gql`
-        query Jobs {
-            jobs {
+// gql is a convenience method to get syntax highlighting in your IDE
+export const getJobsQuery = gql`
+    query Jobs {
+        jobs {
+            id
+            date
+            title
+            company {
                 id
-                date
-                title
-                company {
-                    id
-                    name      
-                }
+                name      
             }
-        }      
-    `;
+        }
+    }      
+`;
 
+export async function getJobs() {
     const result = await apolloClient.query({
-        query,
+        query: getJobsQuery,
         // The default behaviour for requests is to use 'cache-first', which means it first looks into the cache, if it's not there, then query
         // If we want to change it, we can use the fetchPolicy property
         // 'network-only' would only get fresh data, never using the cache
