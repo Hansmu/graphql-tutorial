@@ -94,6 +94,24 @@ export async function deleteJob(id) {
     return result.data.job;
 }
 
+// You can also name your query, by adding a name after the `query` keyword
+const jobByIdQuery = gql`
+# To provide variables using GQL's own mechanisms, you can define them in the query bit
+# You can use string interpolation as well, but that comes with all sorts of annoyances
+query JobById($idVariableRightHereToUse: ID!) {
+    job(id: $idVariableRightHereToUse) {
+        id
+        date
+        title
+        company {
+            id
+            name      
+        }
+        description
+    }
+}      
+`;
+
 export async function createJob({ title, description }) {
     const mutation = gql`
         mutation CreateJob($input: CreateJobInput!) {
@@ -103,7 +121,16 @@ export async function createJob({ title, description }) {
             # However, when you alias it, you get
             # { "data": { "job": { "id": "asdsa" } }
             job: createJob(input: $input) {
+                # Currently, when we're creating a job, we'd be querying for the job by ID right after creating it
+                # However, we could just return the entire object from the same create request
                 id
+                date
+                title
+                company {
+                    id
+                    name      
+                }
+                description
             }
         }
     `;
@@ -115,7 +142,22 @@ export async function createJob({ title, description }) {
                 title,
                 description
             }
-        }    
+        },
+        // In order to tell the cache that the data for a job by ID is available, we can manually manipulate the response after a mutation has been posted
+        // We need to add it to the cache with the same exact structure as a get by ID would be
+        update: (cache, { data }) => {
+            cache.writeQuery({
+                // Need to tell the query what query it would be matching
+                query: jobByIdQuery,
+                // Since it also uses variables to track, then we need to add those
+                variables: {
+                    // Get the ID from the response data
+                    id: data.job.id
+                },
+                // Finally, we define the actual data
+                data,
+            })
+        }
     })
 
     return result.data.job;
@@ -148,27 +190,9 @@ export async function getCompany(id) {
 }
 
 export async function getJob(id) {
-    // You can also name your query, by adding a name after the `query` keyword
-    const query = gql`
-        # To provide variables using GQL's own mechanisms, you can define them in the query bit
-        # You can use string interpolation as well, but that comes with all sorts of annoyances
-        query JobById($idVariableRightHereToUse: ID!) {
-            job(id: $idVariableRightHereToUse) {
-                id
-                date
-                title
-                company {
-                    id
-                    name      
-                }
-                description
-            }
-        }      
-    `;
-
     // Here we can then pass the variables as the second parameter
     const result = await apolloClient.query({
-        query,
+        query: jobByIdQuery,
         variables: {
             idVariableRightHereToUse: id
         }
