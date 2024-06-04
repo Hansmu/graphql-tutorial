@@ -94,12 +94,11 @@ export async function deleteJob(id) {
     return result.data.job;
 }
 
-// You can also name your query, by adding a name after the `query` keyword
-const jobByIdQuery = gql`
-# To provide variables using GQL's own mechanisms, you can define them in the query bit
-# You can use string interpolation as well, but that comes with all sorts of annoyances
-query JobById($idVariableRightHereToUse: ID!) {
-    job(id: $idVariableRightHereToUse) {
+// To avoid duplicating code, then we can use fragments
+
+const jobDetailFragment = gql`
+    # First we give it a name "JobDetail", then we say on which object it applies
+    fragment JobDetail on Job {
         id
         date
         title
@@ -109,7 +108,20 @@ query JobById($idVariableRightHereToUse: ID!) {
         }
         description
     }
-}      
+`;
+
+// You can also name your query, by adding a name after the `query` keyword
+const jobByIdQuery = gql`
+# To provide variables using GQL's own mechanisms, you can define them in the query bit
+# You can use string interpolation as well, but that comes with all sorts of annoyances
+query JobById($idVariableRightHereToUse: ID!) {
+    job(id: $idVariableRightHereToUse) {
+        # Basically like the destructuring syntax from Javascript
+        ...JobDetail
+    }
+}    
+# We just add the code as string interpolation, nothing fancy
+${jobDetailFragment}  
 `;
 
 export async function createJob({ title, description }) {
@@ -123,16 +135,10 @@ export async function createJob({ title, description }) {
             job: createJob(input: $input) {
                 # Currently, when we're creating a job, we'd be querying for the job by ID right after creating it
                 # However, we could just return the entire object from the same create request
-                id
-                date
-                title
-                company {
-                    id
-                    name      
-                }
-                description
+                ...JobDetail
             }
         }
+        ${jobDetailFragment}
     `;
 
     const result = await apolloClient.mutate({
