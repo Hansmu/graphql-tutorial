@@ -39,7 +39,23 @@ const authLink = new ApolloLink((operation, forward) => {
 
 const apolloClient = new ApolloClient({
     link: concat(authLink, httpLink),
-    cache: new InMemoryCache()
+    // When we use the ApolloClient, then there is a cache
+    // This means that whenever you make a request that has already been made, then Apollo reaches into the cache to get the result
+    // Since the current one is in memory, then it'll live only as long as the user hasn't refreshed
+    // To see into the cache, you can use Apollo Devtools
+    // You'll see that the cache is a flat structure
+    // There will also be references. It builds its own key with the object type prefix attached to an id or _id field.
+    cache: new InMemoryCache(),
+    // An override for where to get data can be provided either in the specific queries/mutations or on the client itself
+    // defaultOptions: {
+    //     // Generally, when you're defining it for query, you'll also want to use the same policy for watchQuery
+    //     query: {
+    //         fetchPolicy: 'network-only'
+    //     },
+    //     watchQuery: {
+    //         fetchPolicy: 'network-only'
+    //     }
+    // } 
 });
 
 export async function updateJob(id, { title, description }) {
@@ -176,7 +192,13 @@ export async function getJobs() {
         }      
     `;
 
-    const result = await apolloClient.query({ query });
+    const result = await apolloClient.query({
+        query,
+        // The default behaviour for requests is to use 'cache-first', which means it first looks into the cache, if it's not there, then query
+        // If we want to change it, we can use the fetchPolicy property
+        // 'network-only' would only get fresh data, never using the cache
+        fetchPolicy: 'network-only'
+    });
     return result.data.jobs;
 }
 
