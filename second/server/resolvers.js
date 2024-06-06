@@ -1,5 +1,5 @@
 import { createJob, deleteJob, getJob, getJobs, getJobsByCompany, updateJob } from './db/jobs.js';
-import { companyLoader, getCompany } from './db/companies.js';
+import { getCompany } from './db/companies.js';
 import { GraphQLError } from 'graphql';
 
 const notFoundError = (message) => {
@@ -90,7 +90,7 @@ export const resolvers = {
     // You'd probably want to batch those to waste less resources.
     // There are some packages for this - one being Dataloader.
     Job: {
-        company: (job) => companyLoader.load(job.companyId),
+        company: (job, _args, { companyLoader }) => companyLoader.load(job.companyId),
         date: (job) => job.createdAt.slice(0, 'yyyy-mm-dd'.length)
     }
 };

@@ -6,6 +6,7 @@ import { readFile } from 'node:fs/promises';
 import { resolvers } from './resolvers.js';
 import { authMiddleware, handleLogin } from './auth.js';
 import { getUser } from './db/users.js';
+import { createCompanyLoader } from './db/companies.js';
 
 const PORT = 9000;
 
@@ -31,15 +32,14 @@ app.listen({ port: PORT }, () => {
 
 // The middleware injects a couple of values in here, one of them being the request
 async function getContext({ req }) {
+  const companyLoader = createCompanyLoader();
+  const context = { companyLoader };
+
   // auth is accessible because of the auth middleware. It's a decoded JWT.
   if (req.auth) {
     const userId = req.auth.sub;
-    const user = await getUser(userId);
-    
-    return {
-      user
-    };
+    context.user = await getUser(userId);
   }
 
-  return {};
+  return context;
 }
