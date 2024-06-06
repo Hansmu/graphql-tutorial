@@ -1,5 +1,5 @@
 import { createJob, deleteJob, getJob, getJobs, getJobsByCompany, updateJob } from './db/jobs.js';
-import { getCompany } from './db/companies.js';
+import { companyLoader, getCompany } from './db/companies.js';
 import { GraphQLError } from 'graphql';
 
 const notFoundError = (message) => {
@@ -85,8 +85,12 @@ export const resolvers = {
     // GraphQL automatically passes some values to the resolver
     // One of the values is the object itself
     // Basically the resolver will be run for each job result that will be queried
+
+    // And the above produces an issue - for each job, you're doing an additional DB call.
+    // You'd probably want to batch those to waste less resources.
+    // There are some packages for this - one being Dataloader.
     Job: {
-        company: (job) => getCompany(job.companyId),
+        company: (job) => companyLoader.load(job.companyId),
         date: (job) => job.createdAt.slice(0, 'yyyy-mm-dd'.length)
     }
 };
