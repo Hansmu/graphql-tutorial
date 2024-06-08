@@ -208,14 +208,16 @@ export async function getJob(id) {
 
 // gql is a convenience method to get syntax highlighting in your IDE
 export const getJobsQuery = gql`
-    query Jobs {
-        jobs {
-            id
-            date
-            title
-            company {
+    query Jobs($limit: Int, $offset: Int) {
+        jobs(limit: $limit, offset: $offset) {
+            items {
                 id
-                name      
+                date
+                title
+                company {
+                    id
+                    name      
+                }
             }
         }
     }      

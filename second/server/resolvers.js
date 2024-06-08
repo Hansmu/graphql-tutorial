@@ -1,4 +1,4 @@
-import { createJob, deleteJob, getJob, getJobs, getJobsByCompany, updateJob } from './db/jobs.js';
+import { countJobs, createJob, deleteJob, getJob, getJobs, getJobsByCompany, updateJob } from './db/jobs.js';
 import { getCompany } from './db/companies.js';
 import { GraphQLError } from 'graphql';
 
@@ -59,7 +59,15 @@ export const resolvers = {
 
             return job;
         },
-        jobs: getJobs,
+        jobs: async (_root, { limit, offset }) => {
+            const items = await getJobs(limit, offset);
+            const totalCount = await countJobs();
+        
+            return {
+                items,
+                totalCount
+            };
+        },
         // When an invalid ID is provided, then this returns null. We probably don't want that
         // There are two ways to go about this.
         // 1. Declare that this cannot return null. 

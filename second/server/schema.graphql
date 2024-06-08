@@ -35,9 +35,15 @@ type Query {
     # To make something an array, you surround the type with brackets ([])
     # Also, by default, [Job] means that the array can return null values
     # You need an exclamation mark to mark it as not containing nulls
-    jobs: [Job!]
+    # If you want to implement pagination, there's no real built-in method, you just provide the variable and then run the operations based on that variable
+    jobs(limit: Int, offset: Int): JobSubList
 
     company(id: ID!): Company
+}
+
+type JobSubList {
+    items: [Job!]!
+    totalCount: Int!
 }
 
 # You can define a custom object using the same syntax as the base query.

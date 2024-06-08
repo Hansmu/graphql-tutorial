@@ -16,8 +16,10 @@ export function useCompany(companyId) {
     };
 }
 
-export function useJobs() {
-    const jobsQuery = useQuery(getJobsQuery);
+export function useJobs(limit, offset) {
+    const jobsQuery = useQuery(getJobsQuery, {
+        variables: { limit, offset }
+    });
 
     return {
         jobs: jobsQuery.data?.jobs,
