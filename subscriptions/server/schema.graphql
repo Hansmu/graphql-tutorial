@@ -6,6 +6,12 @@ type Mutation {
   addMessage(text: String!): Message
 }
 
+# Subscriptions have their own top-level type that defaults to Subscription
+type Subscription {
+  # Generally you define a method via an event, so this is triggered whenever a message is added
+  messageAdded: Message
+}
+
 type Message {
   id: ID!
   user: String!
