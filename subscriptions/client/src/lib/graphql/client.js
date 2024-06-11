@@ -12,6 +12,7 @@ const httpLink = concat(authLink, createHttpLink({
 // Able to process GraphQL over Websocket
 const wsLink = new GraphQLWsLink(createWsClient({
   url: 'ws://localhost:9000/graphql',
+  connectionParams: () => ({ accessToken: getAccessToken() }),
 }));
 
 const authLink = new ApolloLink((operation, forward) => {
