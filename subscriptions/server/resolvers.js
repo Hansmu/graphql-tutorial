@@ -32,7 +32,13 @@ export const resolvers = {
       // Since subscriptions happen constantly, then it has a bit of a different signature
       // It has a subscribe method which is an async iterable
       // To simplify the implementation, we can use the `graphql-subscriptions` library
-      subscribe: () => pubSub.asyncIterator('MESSAGE_ADDED'),
+      subscribe: (_root, _args, { user }) => {
+        if (!user) {
+          throw unauthorizedError();
+        }
+
+        return pubSub.asyncIterator('MESSAGE_ADDED');
+      },
     }
   }
 };

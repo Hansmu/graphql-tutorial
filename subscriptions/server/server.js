@@ -5,7 +5,7 @@ import express from 'express';
 import { readFile } from 'node:fs/promises';
 // This method is used to create a HTTP server
 import { createServer as createHttpServer } from 'node:http';
-import { authMiddleware, handleLogin } from './auth.js';
+import { authMiddleware, decodeToken, handleLogin } from './auth.js';
 import { resolvers } from './resolvers.js';
 // This is needed to use WebSockets, as it's a separate protocol, then this is an implementation of it
 import { WebSocketServer } from 'ws';
@@ -24,10 +24,21 @@ app.use(cors(), express.json());
 
 app.post('/login', handleLogin);
 
-function getContext({ req }) {
+function getHttpContext({ req }) {
   if (req.auth) {
     return { user: req.auth.sub };
   }
+  return {};
+}
+
+function getWsContext({ connectionParams }) {
+  const accessToken = connectionParams?.accessToken;
+
+  if (accessToken) {
+    const payload = decodeToken(accessToken);
+    return { user: payload.sub };
+  }
+
   return {};
 }
 
@@ -55,12 +66,12 @@ const schema = makeExecutableSchema({
 const apolloServer = new ApolloServer({ schema });
 await apolloServer.start();
 app.use('/graphql', authMiddleware, apolloMiddleware(apolloServer, {
-  context: getContext,
+  context: getHttpContext,
 }));
 
 // Fourth, you need to integrate the schema with the web socket server
 // This is the one that'll manage the GraphQL subscriptions
-useWsServer({ schema }, wsServer);
+useWsServer({ schema, context: getWsContext }, wsServer);
 
 // Finally, the configurations are done, we boot up the HTTP server
 httpServer.listen({ port: PORT }, () => {
